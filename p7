@@ -1,0 +1,18 @@
+import pandas as pd
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.esitmators import BayesianEsitmators
+from pgmpy.inference import VariableElimination
+
+df=pd.read_csv("Dataset1.csv")
+model=DiscreteBayesianNetwork([
+    ("Attendance","Result"),
+    ("Study","Result")
+])
+model.fit(df, estimator=BayesianEsitmators,prior_type="BDeu")
+inference=VariableElimination(model)
+result=inference.query(
+        variables=["Result"],
+        evidence={"Attendance":"High","Study":"High"})
+print("Proabablity Distribution:")
+print(result)
+print("Likelihood of Passing:",round(result.values[1]*100,2),"%")
