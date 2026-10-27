@@ -1,0 +1,97 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+X=np.array([
+    [1,1],
+    [1,2],
+    [2,1],
+    [8,8],
+    [8,9],
+    [9,8]
+])
+
+rows=2
+cols=2
+
+np.random.seed(42)
+W=np.random.rand(rows,cols,2)
+learning_rate=0.5
+
+print("INITIAL WEIGHTS")
+print("==================")
+
+for i in range(rows):
+    for j in range(cols):
+        print("Neuron",(i,j),":",W[i,j])
+
+for epoch in range(2):
+    print("\n============ EPOCH:",epoch+1,"============")
+
+    for x in X:
+        print("\nInput:",x)
+        old_W=W.copy()
+        distance=np.zeros((rows,cols))
+
+        for i in range(rows):
+            for j in range(cols):
+                distance[i,j]=np.linalg.norm(x-W[i,j])
+
+        print("\n Distances")
+
+        for i in range(rows):
+            for j in range(cols):
+                print("Neuron",(i,j),":",
+                "Distance=",round(distance[i,j],3))
+        
+        bmu=tuple(map(int,np.unravel_index(np.argmin(distance),distance.shape)))
+        print("\n Winning Unit (bmu):",bmu)
+
+        for i in range(rows):
+            for j in range(cols):
+                if (abs(i-bmu[0])<=1 and abs(j-bmu[1])<=1):
+                    W[i,j]+=learning_rate*(x-W[i,j])
+        
+        print("\nOld weights -> Updated weights")
+
+        for i in range(rows):
+            for j in range(cols):
+                print("Neuron",(i,j),":",
+                np.round(old_W[i,j],3),"->",
+                np.round(W[i,j],3))
+
+    learning_rate*=0.9
+
+print("\n FINAL WEIGHTS")
+print("==================")
+for i in range(rows):
+    for j in range(cols):
+        print("Neuron",(i,j),":",np.round(W[i,j],3))
+
+test=np.array([8,8])
+print("\n TESTING")
+print("====================")
+print("Test Data:",test)
+
+distance=np.zeros((rows,cols))
+
+for i in range(rows):
+    for j in range(cols):
+        distance[i,j]=np.linalg.norm(test-W[i,j])
+        print("Neuron",(i,j),":",
+                "Distance=",round(distance[i,j],3))
+
+bmu=tuple(map(int,np.unravel_index(np.argmin(distance),distance.shape)))
+print("\n Winning Unit (bmu) for testi data:",bmu)
+
+plt.scatter(X[:,0],X[:,1],label="Training Data")
+
+for i in range(rows):
+    for j in range(cols):
+        plt.scatter(W[i,j,0],W[i,j,1],s=100)
+        plt.text(W[i,j,0],W[i,j,1],f"({i},{j})")
+plt.xlabel="Feature 1"
+plt.ylabel="Feature 2"
+plt.title("Self Organizing feature map")
+plt.legend()
+plt.grid()
+plt.show()
